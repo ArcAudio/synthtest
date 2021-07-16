@@ -1,0 +1,308 @@
+<html>
+    <link rel="stylesheet" href="./css/style.css">
+    <head>
+    <H1> Plugin in midi key board </H1>
+    </head>
+    <body>
+        
+    <!-- <P> synth volume:
+    <input type="range" oninput="changeVolume(event) "min="0" max="1" value="0.5" step="0.01"/>         -->
+    <P> LFO freq:
+    <input type="range" oninput="changeLFOFreq(event) "min="0.001" max="10" value="0.2" step="0.001"/>
+    <P> LFO depth:
+    <input type="range" oninput="changeLFODepth(event) "min="0" max="1" value="0" step="0.01"/>   
+    <P> Synth Decay:
+    <input type="range" oninput="changeDecay(event) "min="0.1" max="400" value="60" step="0.1"/>   
+    <P> Synth Attack:
+    <input type="range" oninput="changeAttack(event) "min="0.01" max="400" value="60" step="0.01"/>
+    
+    <P> Synth Sustain:
+    <input type="range" oninput="changeSustain(event) "min="0.1" max="1" value="0.2" step="0.001"/>   
+    <P> Synth Release:
+    <input type="range" oninput="changeRelease(event) "min="0.01" max="400" value="100" step="0.01"/> 
+
+    <P> Synth Tracking:
+    <input type="range" oninput="changeTracking(event) "min="0.0" max="2" value="1" step="0.001"/>   
+    <P> Synth EnvMod:
+    <input type="range" oninput="changeEnvMod(event) "min="0" max="100" value="50" step="0.01"/> 
+    <!-- <P> Trem freq:
+    <input type="range" oninput="changeTFreq(event) "min="0." max="100" value="0.1" step="0.1"/>
+    <P> Trem depth:
+    <input type="range" oninput="changeTDepth(event) "min="0" max="1" value="0" step="0.1"/>   
+    <P> Trem Wet:
+    <input type="range" oninput="changeTWet(event) "min="0" max="1" value="0" step="0.1"/>    -->
+
+    <P> Cutoff:
+        <input type="range" oninput="changeCutoff(event) "min="20" max="5000" value="500" step="0.1"/>   
+    <!-- Load 'faust2wasm' script generated .js file -->
+    
+    <P> Resonance:
+        <input type="range" oninput="changeRes(event) "min="0.5" max="5" value="2" step="0.1"/>  
+    
+    <script src="synth.js"></script>
+    
+    <script>
+        
+    if (typeof (WebAssembly) === "undefined") {
+        alert("WebAssembly is not supported in this browser, the page will not work !")
+    }
+    
+    var isWebKitAudio = (typeof (webkitAudioContext) !== "undefined");
+    var audio_context = (isWebKitAudio) ? new webkitAudioContext() : new AudioContext();
+    var synth_dsp = null;
+    
+    // Slider handler to change the 'synth' volume
+    // function changeVolume(event)
+    // {
+    //     var val = event.target.value;
+    //     val = parseFloat(val);
+    //     console.log(val);
+    //     synth_dsp.setParamValue("/synth/volume", val);
+    //     console.log(synth_dsp.getParams());
+    // }
+
+    function changeCutoff(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+        //console.log(val);
+        synth_dsp.setParamValue("/synth/fc", val);
+        //console.log(synth_dsp.getParams());
+    }
+
+    function changeRes(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+        //console.log(val);
+        synth_dsp.setParamValue("/synth/resonnance", val);
+    }
+
+    // Slider handler to change the 'osc' volume
+    function changeLFOFreq(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+        //console.log(val);
+        synth_dsp.setParamValue("/synth/lfoFreq", val);
+    }
+
+    function changeLFODepth(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/modwheel", val);
+    }
+
+    function changeDecay(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/decay", val);
+    }
+
+    function changeAttack(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/attack", val);
+    }
+
+    function changeRelease(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/release", val);
+    }
+
+    function changeSustain(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/sustain", val);
+    }
+
+    function changeEnvMod(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/envMod", val);
+    }
+
+    function changeTracking(event)
+    {
+        var val = event.target.value;
+        val = parseFloat(val);
+       // console.log(val);
+        synth_dsp.setParamValue("/synth/tracking", val);
+    }
+
+    // function changeFWet(event)
+    // {
+    //     var val = event.target.value;
+    //     val = parseFloat(val);
+    //     console.log(val);
+    //     synth_dsp.setParamValue("/synth/fwet", val);
+    // }
+
+    // function changeTFreq(event)
+    // {
+    //     var val = event.target.value;
+    //     val = parseFloat(val);
+    //     console.log(val);
+    //     synth_dsp.setParamValue("/synth/tfreq", val);
+    // }
+
+    // function changeTDepth(event)
+    // {
+    //     var val = event.target.value;
+    //     val = parseFloat(val);
+    //     console.log(val);
+    //     synth_dsp.setParamValue("/synth/tdepth", val);
+    // }
+
+    // function changeTWet(event)
+    // {
+    //     var val = event.target.value;
+    //     val = parseFloat(val);
+    //     console.log(val);
+    //     synth_dsp.setParamValue("/synth/twet", val);
+    // }
+    
+    // MIDI input handling
+    function keyOn(channel, pitch, velocity)
+    {
+        if (synth_dsp) {
+            synth_dsp.keyOn(channel, pitch, velocity);
+        }
+    }
+    
+    function keyOff(channel, pitch, velocity)
+    {
+        if (synth_dsp) {
+            synth_dsp.keyOff(channel, pitch, velocity);
+        }
+    }
+    
+    function pitchWheel(channel, bend)
+    {
+        if (synth_dsp) {
+            synth_dsp.pitchWheel(channel, bend);
+        }
+    }
+    
+    function ctrlChange(channel, ctrl, value)
+    {
+        if (synth_dsp) {
+            synth_dsp.ctrlChange(channel, ctrl, value);
+        }
+    }
+    
+    function midiMessageReceived(ev)
+    {
+        var cmd = ev.data[0] >> 4;
+        var channel = ev.data[0] & 0xf;
+        var data1 = ev.data[1];
+        var data2 = ev.data[2];
+        
+        if (channel === 9) {
+            return;
+        } else if (cmd === 8 || ((cmd === 9) && (data2 === 0))) {
+            keyOff(channel, data1, data2);
+        } else if (cmd === 9) {
+            keyOn(channel, data1, data2);
+        } else if (cmd === 11) {
+            ctrlChange(channel, data1, data2);
+        } else if (cmd === 14) {
+            pitchWheel(channel, (data2 * 128.0 + data1));
+        }
+    }
+    
+    function onerrorcallback(error)
+    {
+        console.log(error);
+    }
+    
+    function onsuccesscallbackStandard(access)
+    {
+        access.onstatechange = function(e) {
+            if (e.port.type === "input") {
+                if (e.port.state === "connected") {
+                    console.log(e.port.name + " is connected");
+                    e.port.onmidimessage = midiMessageReceived;
+                } else if (e.port.state  === "disconnected") {
+                    console.log(e.port.name + " is disconnected");
+                    e.port.onmidimessage = null;
+                }
+            }
+        }
+        
+        for (var input of access.inputs.values()) {
+            input.onmidimessage = midiMessageReceived;
+            console.log(input.name + " is connected");
+        }
+    }
+    
+    function activateMIDIInput()
+    {
+        console.log("activateMIDIInput");
+        if (typeof(navigator.requestMIDIAccess) !== "undefined") {
+            navigator.requestMIDIAccess().then(onsuccesscallbackStandard, onerrorcallback);
+        } else {
+            alert("MIDI input cannot be activated, either your browser still does't have it, or you need to explicitly activate it.");
+        }
+    }
+    
+    function startsynth()
+    {
+      // Create the Faust generated node
+        var pluginURL = ".";
+        var plugin = new FaustsynthPoly(audio_context, 16, pluginURL);
+        plugin.load().then(node => {
+                                 synth_dsp = node;
+                                //console.log(synth_dsp.getJSON());
+                                // Print paths to be used with 'setParamValue'
+                                console.log(synth_dsp.getParams());
+                                // Connect it to output as a regular WebAudio node
+                                synth_dsp.connect(audio_context.destination);
+                                // Activate MIDI
+                                activateMIDIInput();
+                          });
+    }
+    
+    // Load handler
+    window.addEventListener('load', startsynth);
+    
+    // To activate audio on iOS
+    window.addEventListener('touchstart', function() {
+                            if (audio_context.state !== "suspended") return;
+                            // create empty buffer
+                            var buffer = audio_context.createBuffer(1, 1, 22050);
+                            var source = audio_context.createBufferSource();
+                            source.buffer = buffer;
+                            
+                            // connect to output (your speakers)
+                            source.connect(audio_context.destination);
+                            
+                            // play the file
+                            source.start();
+                            
+                            audio_context.resume().then(() => console.log("Audio resumed"));
+                            }, false);
+    
+    // On desktop
+    window.addEventListener("mousedown", () => {
+        if (audio_context.state !== "suspended") return;
+        audio_context.resume().then(() => console.log("Audio resumed"))
+    });  
+    
+    </script>
+    
+    </body>
+    </html>
